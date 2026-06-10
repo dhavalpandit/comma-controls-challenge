@@ -1,5 +1,6 @@
-__pycache__/
+venv/
 data/
+SYNTHETIC_V0.zip
+__pycache__/
+*.pyc
 report.html
-models/tinyphysics_*.onnx
-*.swp
