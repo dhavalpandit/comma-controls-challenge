@@ -1,0 +1,42 @@
+from . import BaseController
+import numpy as np
+
+
+class Controller(BaseController):
+  """
+  Preview PID controller.
+  Uses current error plus future target lateral acceleration preview.
+  """
+
+  def __init__(self):
+    self.p = 0.195
+    self.i = 0.100
+    self.d = -0.053
+
+    self.preview_gain = 0.05
+    self.preview_step = 15
+
+    self.error_integral = 0.0
+    self.prev_error = 0.0
+
+  def update(self, target_lataccel, current_lataccel, state, future_plan):
+    error = target_lataccel - current_lataccel
+    self.error_integral += error
+    self.error_integral = float(np.clip(self.error_integral, -40.0, 40.0))
+
+    error_diff = error - self.prev_error
+    self.prev_error = error
+
+    preview_term = 0.0
+    if future_plan is not None and len(future_plan.lataccel) > self.preview_step:
+      future_target = future_plan.lataccel[self.preview_step]
+      preview_term = self.preview_gain * (future_target - target_lataccel)
+
+    action = (
+      self.p * error
+      + self.i * self.error_integral
+      + self.d * error_diff
+      + preview_term
+    )
+
+    return float(np.clip(action, -2.0, 2.0))
