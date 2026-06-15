@@ -4,3 +4,5 @@ SYNTHETIC_V0.zip
 __pycache__/
 *.pyc
 report.html
+.DS_Store
+submission.zip
